@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <!-- Monochrome Single-Color (White/Transparent) version -->
+  <rect width="500" height="120" fill="transparent" />
+  <g transform="translate(20, 15)">
+    <rect x="0" y="0" width="90" height="90" rx="20" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <rect x="14" y="8" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <rect x="40" y="8" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <rect x="66" y="8" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <rect x="14" y="74" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <rect x="40" y="74" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <rect x="66" y="74" width="10" height="8" rx="2" fill="#FFFFFF" />
+    <polygon points="38,30 38,60 62,45" fill="#FFFFFF" />
+  </g>
+  <text x="135" y="68" font-family="'Inter', sans-serif" font-weight="900" font-size="44" fill="#FFFFFF" letter-spacing="3">
+    CINEORA
+  </text>
+  <text x="138" y="92" font-family="'Inter', sans-serif" font-weight="500" font-size="12" fill="#FFFFFF" letter-spacing="2" opacity="0.8">
+    YOUR CINEMA. EVERYWHERE.
+  </text>
+</svg>

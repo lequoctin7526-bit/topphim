@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="redGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF1E27" />
+      <stop offset="100%" stop-color="#B20710" />
+    </linearGradient>
+  </defs>
+  <!-- Dark Background version -->
+  <rect width="500" height="120" fill="#090909" rx="12"/>
+  <g transform="translate(20, 15)">
+    <rect x="0" y="0" width="90" height="90" rx="20" fill="#151515" stroke="#292929" stroke-width="1.5" />
+    <rect x="14" y="8" width="10" height="8" rx="2" fill="#E50914" />
+    <rect x="40" y="8" width="10" height="8" rx="2" fill="#E50914" />
+    <rect x="66" y="8" width="10" height="8" rx="2" fill="#E50914" />
+    <rect x="14" y="74" width="10" height="8" rx="2" fill="#E50914" />
+    <rect x="40" y="74" width="10" height="8" rx="2" fill="#E50914" />
+    <rect x="66" y="74" width="10" height="8" rx="2" fill="#E50914" />
+    <polygon points="38,30 38,60 62,45" fill="url(#redGradDark)" />
+  </g>
+  <text x="135" y="68" font-family="'Inter', sans-serif" font-weight="900" font-size="44" fill="#FFFFFF" letter-spacing="3">
+    CINE<tspan fill="#E50914">ORA</tspan>
+  </text>
+  <text x="138" y="92" font-family="'Inter', sans-serif" font-weight="500" font-size="12" fill="#A3A3A3" letter-spacing="2">
+    YOUR CINEMA. EVERYWHERE.
+  </text>
+</svg>
