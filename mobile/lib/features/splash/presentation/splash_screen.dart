@@ -17,6 +17,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late Animation<double> _textFadeAnimation;
   late Animation<double> _glowPulseAnimation;
 
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _controller.forward();
 
     // After 2.3 seconds smoothly navigate to main screen
-    Timer(const Duration(milliseconds: 2300), () {
+    _navigationTimer = Timer(const Duration(milliseconds: 2300), () {
       if (mounted) {
         context.go('/');
       }
@@ -69,6 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    _navigationTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

@@ -7,6 +7,9 @@ node_modules/
 dist/
 build/
 coverage/
+.gradle/
+**/android/.gradle/
+**/android/app/.gradle/
 
 # Flutter / Dart
 .dart_tool/
