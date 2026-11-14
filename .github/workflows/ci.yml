@@ -1,10 +1,14 @@
-name: CINEORA CI Pipeline
+name: CINEORA CI & Release Pipeline
 
 on:
   push:
     branches: [ main, master, develop ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   backend-test-and-build:
@@ -72,7 +76,7 @@ jobs:
         working-directory: backend
         run: npm run build
 
-  mobile-analysis:
+  mobile-quality-gate:
     name: Flutter Mobile Quality Gate
     runs-on: ubuntu-latest
     steps:
@@ -92,3 +96,128 @@ jobs:
       - name: Run Flutter Tests
         working-directory: mobile
         run: flutter test
+
+  build-android-apk:
+    name: Build Android APK
+    needs: [backend-test-and-build, mobile-quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Prepare Flutter Android Harness
+        working-directory: mobile
+        run: |
+          cp pubspec.yaml pubspec.yaml.bak
+          flutter create --org tv.cineora --project-name cineora .
+          cp pubspec.yaml.bak pubspec.yaml
+          flutter pub get
+
+      - name: Build Android Release APK
+        working-directory: mobile
+        run: flutter build apk --release
+
+      - name: Prepare APK Output
+        run: |
+          cp mobile/build/app/outputs/flutter-apk/app-release.apk cineora-release.apk
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cineora-android-apk
+          path: cineora-release.apk
+          if-no-files-found: error
+
+  build-ios-ipa:
+    name: Build iOS IPA
+    needs: [backend-test-and-build, mobile-quality-gate]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Prepare Flutter iOS Harness
+        working-directory: mobile
+        run: |
+          cp pubspec.yaml pubspec.yaml.bak
+          flutter create --org tv.cineora --project-name cineora .
+          cp pubspec.yaml.bak pubspec.yaml
+          flutter pub get
+
+      - name: Build iOS Release (no codesign)
+        working-directory: mobile
+        run: flutter build ios --release --no-codesign
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r mobile/build/ios/iphoneos/Runner.app Payload/
+          zip -r cineora-release.ipa Payload
+
+      - name: Upload iOS IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cineora-ios-ipa
+          path: cineora-release.ipa
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish Release (APK & IPA)
+    needs: [build-android-apk, build-ios-ipa]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: cineora-android-apk
+
+      - name: Download iOS IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: cineora-ios-ipa
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "CINEORA v1.0.0 - Production Release (APK & IPA)"
+          draft: false
+          prerelease: false
+          body: |
+            ## CINEORA Streaming Platform v1.0.0 - Production Release
+
+            ### 📲 Tải ứng dụng / Download Builds:
+            - 🤖 **Android APK:** [`cineora-release.apk`](https://github.com/lequoctin7526-bit/topphim/releases/download/v1.0.0/cineora-release.apk) (Cài trực tiếp trên điện thoại Android, Android TV hoặc Emulator)
+            - 🍏 **iOS IPA:** [`cineora-release.ipa`](https://github.com/lequoctin7526-bit/topphim/releases/download/v1.0.0/cineora-release.ipa) (Cài đặt qua AltStore, Sideloadly, TrollStore hoặc Apple Configurator)
+
+            ---
+            ### ✨ Tính năng nổi bật:
+            - **Dark Cinema Theme:** Giao diện chuẩn điện ảnh OLED (#090909, #E50914).
+            - **Trình phát HLS Streaming:** Tua 10s, chọn chất lượng (1080p, 720p), phụ đề tiếng Việt & âm thanh vòm.
+            - **Tiếp tục xem:** Tự động ghi nhớ vị trí phát và đồng bộ đa thiết bị.
+            - **Khám phá & Tìm kiếm:** Lọc đa chiều theo quốc gia, thể loại; tìm kiếm tiếng Việt không dấu.
+            - **Tài khoản & Bản quyền:** Xác thực JWT an toàn, bảo vệ luồng phát bằng chữ ký HMAC có thời hạn.
+          files: |
+            cineora-release.apk
+            cineora-release.ipa
