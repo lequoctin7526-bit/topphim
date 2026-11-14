@@ -36,7 +36,6 @@ dependencies:
 
   # Video Streaming Player
   video_player: ^2.8.6
-  chewie: ^1.8.1
 
   # JSON Serialization
   json_annotation: ^4.9.0

@@ -158,37 +158,32 @@ jobs:
         working-directory: mobile
         run: |
           cp pubspec.yaml pubspec.yaml.bak
+          cp ios/Podfile ios/Podfile.bak 2>/dev/null || true
           flutter create --org tv.cineora --project-name cineora .
           cp pubspec.yaml.bak pubspec.yaml
+          cp ios/Podfile.bak ios/Podfile 2>/dev/null || true
 
-          # Bypass Team restriction by configuring Release.xcconfig
+          # Set team and deployment targets in xcconfig
           echo "DEVELOPMENT_TEAM=CINEORA123" >> ios/Flutter/Release.xcconfig
           echo "CODE_SIGNING_ALLOWED=NO" >> ios/Flutter/Release.xcconfig
           echo "CODE_SIGNING_REQUIRED=NO" >> ios/Flutter/Release.xcconfig
           echo "CODE_SIGN_IDENTITY=" >> ios/Flutter/Release.xcconfig
+          echo "IPHONEOS_DEPLOYMENT_TARGET=13.0" >> ios/Flutter/Release.xcconfig
 
-          # Configure project.pbxproj with team
+          # Configure project.pbxproj with team and target 13.0
           sed -i '' 's/DEVELOPMENT_TEAM = "";/DEVELOPMENT_TEAM = "CINEORA123";/g' ios/Runner.xcodeproj/project.pbxproj || true
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/g' ios/Runner.xcodeproj/project.pbxproj || true
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/IPHONEOS_DEPLOYMENT_TARGET = 13.0;/g' ios/Runner.xcodeproj/project.pbxproj || true
 
           flutter pub get
           cd ios
-          pod install
+          pod install --repo-update
           cd ..
 
       - name: Build iOS Release (no codesign)
         working-directory: mobile
         run: |
-          flutter build ios --release --no-codesign || \
-          xcodebuild -workspace ios/Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -sdk iphoneos \
-            CONFIGURATION_BUILD_DIR=$PWD/build/ios/iphoneos \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            clean build
+          flutter build ios --release --no-codesign
 
       - name: Package IPA
         run: |
