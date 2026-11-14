@@ -8,10 +8,12 @@ class CineoraScaffold extends StatelessWidget {
   const CineoraScaffold({super.key, required this.child});
 
   int _calculateSelectedIndex(BuildContext context) {
-    final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/discovery')) return 1;
-    if (location.startsWith('/favorites')) return 2;
-    if (location.startsWith('/profile')) return 3;
+    try {
+      final String location = GoRouterState.of(context).uri.path;
+      if (location.startsWith('/discovery')) return 1;
+      if (location.startsWith('/favorites')) return 2;
+      if (location.startsWith('/profile')) return 3;
+    } catch (_) {}
     return 0;
   }
 
